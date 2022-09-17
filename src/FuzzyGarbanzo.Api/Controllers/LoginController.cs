@@ -1,11 +1,13 @@
+using FuzzyGarbanzo.Api.Controllers.Base;
 using FuzzyGarbanzo.Api.Dtos;
+using FuzzyGarbanzo.Api.Models;
+using FuzzyGarbanzo.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FuzzyGarbanzo.Api.Controllers
 {
-    [ApiController]
-    [Route("[controller]")]
-    public class LoginController : ControllerBase
+    public class LoginController : MainController
     {
 
         private readonly ILogger<LoginController> _logger;
@@ -16,24 +18,26 @@ namespace FuzzyGarbanzo.Api.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public IActionResult EfetuarLogin([FromBody] UsuarioDto requisicao)
         {
             try
             {
-                if (requisicao == null || string.IsNullOrEmpty(requisicao.Login) || string.IsNullOrEmpty(requisicao.Senha))
+                var usuario = new Usuario()
                 {
-                    return BadRequest(new ErroRespostaDto()
-                    {
-                        Status = StatusCodes.Status400BadRequest,
-                        Erro = "Paramentros de entrada invalido"
-                    });
-                }
+                    Id = 1,
+                    Nome = "Rondinele Guimaraes",
+                    Email = "rondineleg@gmail.com",
+                    Senha = "@Bia120715"
+                };
+
+                var token = TokenService.CriarToken(usuario);
 
                 return Ok(new LoginRespostaDto()
                 {
-                    Email = requisicao.Login,
-                    Nome = requisicao.Senha,
-                    Token = ""
+                    Email = usuario.Email,
+                    Nome = usuario.Nome,
+                    Token = token
                 });
 
             }
